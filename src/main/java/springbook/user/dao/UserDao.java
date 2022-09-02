@@ -3,20 +3,22 @@ package springbook.user.dao;
 import springbook.user.domain.User;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class UserDao {
-    private SimpleConnectionMaker simpleConnectionMaker;
+    // 인터페이스를 통해 오브젝트에 접근하므로 구체적인 클래스 정보를 알 필요가 없음
+    private ConnectionMaker connectionMaker;
 
+    // 여기서는 구체적인 클래스 이름이 나옴
     public UserDao() {
-        simpleConnectionMaker = new SimpleConnectionMaker();
+        connectionMaker = new DConnectionMaker();
     }
 
     public void add(User user) throws ClassNotFoundException, SQLException {
-        Connection c = simpleConnectionMaker.makeNewConnection();
+        // 인터페이스에 정의된 메소드를 사용하므로 클래스가 바뀐다고 해도 메소드 이름이 변경될 걱정은 없음
+        Connection c = connectionMaker.makeConnection();
 
         PreparedStatement ps = c.prepareStatement("insert into users(id, name, password) values(?,?,?)");
         ps.setString(1, user.getId());
@@ -30,7 +32,7 @@ public class UserDao {
     }
 
     public User get(String id) throws ClassNotFoundException, SQLException {
-        Connection c = simpleConnectionMaker.makeNewConnection();
+        Connection c = connectionMaker.makeConnection();
 
         PreparedStatement ps = c.prepareStatement("select * from users where id = ?");
         ps.setString(1, id);
