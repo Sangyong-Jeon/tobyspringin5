@@ -8,12 +8,18 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class UserDao {
-    // 인터페이스를 통해 오브젝트에 접근하므로 구체적인 클래스 정보를 알 필요가 없음
+    private static UserDao INSTANCE;
     private ConnectionMaker connectionMaker;
 
     // 여기서는 구체적인 클래스 이름이 나왔었지만 수정하여 인터페이스 타입을 외부에서 받음
     public UserDao(ConnectionMaker connectionMaker) {
         this.connectionMaker = connectionMaker;
+    }
+
+    public static synchronized UserDao getInstance() {
+        if (INSTANCE == null) INSTANCE = new UserDao(???);
+
+        return INSTANCE;
     }
 
     public void add(User user) throws ClassNotFoundException, SQLException {
