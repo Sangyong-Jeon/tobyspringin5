@@ -8,8 +8,23 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class UserDao {
-    private static UserDao INSTANCE;
+    // 초기에 설정하면 사용 중에는 바뀌지 않는 읽기전용 인스턴스 변수
     private ConnectionMaker connectionMaker;
+    // 매번 새로운 값으로 바뀌는 정보를 담은 인스턴스 변수인 c와 user.
+    // 심각한 문제가 발생하게 됨.
+    private Connection c;
+    private User user;
+
+    public User get(String id) throws ClassNotFoundException, SQLException {
+        this.c = connectionMaker.makeConnection();
+        ...
+        this.user = new User();
+        this.user.setId(rs.getString("id"));
+        this.user.setName(rs.getString("name"));
+        this.user.setPassword(rs.getSTring("password"));
+        ...
+        return this.user;
+    }
 
     // 여기서는 구체적인 클래스 이름이 나왔었지만 수정하여 인터페이스 타입을 외부에서 받음
     public UserDao(ConnectionMaker connectionMaker) {
