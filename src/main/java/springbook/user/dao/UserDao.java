@@ -15,6 +15,12 @@ public class UserDao {
     private Connection c;
     private User user;
 
+    // 수정자 메소드 DI 방식을 사용한 UserDao
+    // 이것은 수정자 메소드 DI의 전형적인 코드이다.
+    public void setConnectionMaker(ConnectionMaker connectionMaker) {
+        this.connectionMaker = connectionMaker;
+    }
+
     public User get(String id) throws ClassNotFoundException, SQLException {
         this.c = connectionMaker.makeConnection();
         ...
@@ -32,7 +38,7 @@ public class UserDao {
     }
 
     public static synchronized UserDao getInstance() {
-        if (INSTANCE == null) INSTANCE = new UserDao(???);
+        if (INSTANCE == null) INSTANCE = new UserDao( ???);
 
         return INSTANCE;
     }
