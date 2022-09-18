@@ -7,7 +7,10 @@ import java.sql.SQLException;
 
 public class UserDaoTest {
     public static void main(String[] args) throws ClassNotFoundException, SQLException {
-        Application context = new AnnotationConfigurationContext(DaoFactory.class);
+        // GenericXmlApplicationContext를 이용해 애플리케이션 컨텍스트를 생성하게 만듬.
+        // 생성자에는 applicationContext.xml의 클래스패스를 넣는다.
+        // 클래스패스를 시작하는 "/"는 생략가능함. "/" 생략해도 항상 루트에서부터 시작하는 클래스패스이다.
+        ApplicationContext context = new GenericXmlApplicationContext("applicationContext.xml");
         UserDao dao = context.getBean("userDao", UserDao.class);
 
         User user = new User();
