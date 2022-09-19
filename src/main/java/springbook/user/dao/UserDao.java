@@ -2,50 +2,23 @@ package springbook.user.dao;
 
 import springbook.user.domain.User;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class UserDao {
-    // 초기에 설정하면 사용 중에는 바뀌지 않는 읽기전용 인스턴스 변수
-    private ConnectionMaker connectionMaker;
-    // 매번 새로운 값으로 바뀌는 정보를 담은 인스턴스 변수인 c와 user.
-    // 심각한 문제가 발생하게 됨.
-    private Connection c;
-    private User user;
+    // 자바에서 DB 커넥션을 가져오는 오브젝트의 기능을 추상화한 인터페이스
+    private DataSource dataSource;
 
-    // 수정자 메소드 DI 방식을 사용한 UserDao
-    // 이것은 수정자 메소드 DI의 전형적인 코드이다.
-    public void setConnectionMaker(ConnectionMaker connectionMaker) {
-        this.connectionMaker = connectionMaker;
+    public void setDataSource(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
-    public User get(String id) throws ClassNotFoundException, SQLException {
-        this.c = connectionMaker.makeConnection();
-        ...
-        this.user = new User();
-        this.user.setId(rs.getString("id"));
-        this.user.setName(rs.getString("name"));
-        this.user.setPassword(rs.getSTring("password"));
-        ...
-        return this.user;
-    }
-
-    // 여기서는 구체적인 클래스 이름이 나왔었지만 수정하여 인터페이스 타입을 외부에서 받음
-    public UserDao(ConnectionMaker connectionMaker) {
-        this.connectionMaker = connectionMaker;
-    }
-
-    public static synchronized UserDao getInstance() {
-        if (INSTANCE == null) INSTANCE = new UserDao( ???);
-
-        return INSTANCE;
-    }
-
-    public void add(User user) throws ClassNotFoundException, SQLException {
+    public void add(User user) throws SQLException {
         // 인터페이스에 정의된 메소드를 사용하므로 클래스가 바뀐다고 해도 메소드 이름이 변경될 걱정은 없음
-        Connection c = connectionMaker.makeConnection();
+        Connection c = dataSource.getConnection();
 
         PreparedStatement ps = c.prepareStatement("insert into users(id, name, password) values(?,?,?)");
         ps.setString(1, user.getId());
@@ -58,8 +31,8 @@ public class UserDao {
         c.close();
     }
 
-    public User get(String id) throws ClassNotFoundException, SQLException {
-        Connection c = connectionMaker.makeConnection();
+    public User get(String id) throws SQLException {
+        Connection c = dataSource.getConnection();
 
         PreparedStatement ps = c.prepareStatement("select * from users where id = ?");
         ps.setString(1, id);
